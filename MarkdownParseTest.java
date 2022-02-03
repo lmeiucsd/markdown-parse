@@ -52,13 +52,13 @@ public class MarkdownParseTest { // file's class
         assertEquals(fileContent.toString(), "[# title\n\n[]link goes here]");
     }
 
-    // @Test
-    // public void customTest5() throws Exception {
-    //     // public static ArrayList<String> getLinks(String markdown) {
-    //     setup("test-file2.md");
-    //     ArrayList<String> fileContent = MarkdownParse.getLinks(file1);
-    //     assertEquals(fileContent.toString(), "[https://something.com, some-page.html]");
-    // }
+    @Test
+    public void customTest5() throws Exception {
+        // public static ArrayList<String> getLinks(String markdown) {
+        setup("test-file2.md");
+        ArrayList<String> fileContent = MarkdownParse.getLinks(file1);
+        assertEquals(fileContent.toString(), "[https://something.com, some-page.html]");
+    }
 
     @Test
     public void customTest6() throws Exception {
@@ -67,12 +67,4 @@ public class MarkdownParseTest { // file's class
         ArrayList<String> fileContent = MarkdownParse.getLinks(file1);
         assertEquals(fileContent.toString(), "[]");
     }
-
-    @Test
-    public void customTest7() throws Exception {
-        // public static ArrayList<String> getLinks(String markdown) {
-        setup("test-file4.md");
-        ArrayList<String> fileContent = MarkdownParse.getLinks(file1);
-        assertEquals(fileContent.toString(), "");
     }
-}
