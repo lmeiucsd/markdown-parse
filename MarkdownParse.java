@@ -7,6 +7,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.commonmark.node.*;
+import org.commonmark.parser.Parser;
+import org.commonmark.renderer.html.HtmlRenderer;
 
 public class MarkdownParse {
 
@@ -51,38 +54,23 @@ public class MarkdownParse {
         }
     }
     public static ArrayList<String> getLinks(String markdown) {
-        ArrayList<String> toReturn = new ArrayList<>();
-        // find the next [, then find the ], then find the (, then take up to
-        // the next )
-        int currentIndex = 0;
-        while(currentIndex < markdown.length()) {
-            int nextOpenBracket = markdown.indexOf("[", currentIndex);
-            int nextCodeBlock = markdown.indexOf("\n```");
-            if(nextCodeBlock < nextOpenBracket && nextCodeBlock != -1) {
-                int endOfCodeBlock = markdown.indexOf("\n```");
-                currentIndex = endOfCodeBlock + 1;
-                continue;
-            }
-            int nextCloseBracket = markdown.indexOf("]", nextOpenBracket);
-            int openParen = markdown.indexOf("(", nextCloseBracket);
-
-            // The close paren we need may not be the next one in the file
-            int closeParen = findCloseParen(markdown, openParen);
-            
-            if(nextOpenBracket == -1 || nextCloseBracket == -1
-                  || closeParen == -1 || openParen == -1) {
-                return toReturn;
-            }
-            String potentialLink = markdown.substring(openParen + 1, closeParen).trim();
-            if(potentialLink.indexOf(" ") == -1 && potentialLink.indexOf("\n") == -1) {
-                toReturn.add(potentialLink);
-                currentIndex = closeParen + 1;
-            }
-            else {
-                currentIndex = currentIndex + 1;
+        class LinkCountVisitor extends AbstractVisitor {
+            int linkCount = 0;
+            ArrayList<String> links = new ArrayList<>();
+            @Override
+            public void visit(Link link){
+                if(link.getDestination() != null){
+                    linkCount++;
+                    links.add(link.getDestination());
+                }
+                visitChildren(link);
             }
         }
-        return toReturn;
+        Parser parser = Parser.builder().build();
+        Node node = parser.parse(markdown);
+        LinkCountVisitor visitor = new LinkCountVisitor();
+        node.accept(visitor);
+        return visitor.links;
     }
     public static void main(String[] args) throws IOException {
         Path fileName = Path.of(args[0]);
